@@ -1,48 +1,72 @@
 
 
 
-import React, { useState } from 'react';
-import { Button, Container, Form, Card, Row, Col } from 'react-bootstrap';
+
+
+import React, { useState, useEffect } from 'react';
+import { Button, Container, Card, Row, Col, ProgressBar } from 'react-bootstrap';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 
 const SpeechToText = () => {
+  const [isListening, setIsListening] = useState(false);
   const [transcriptWithTimestamp, setTranscriptWithTimestamp] = useState([]);
-  const [inputText, setInputText] = useState('');
+  const [recognition, setRecognition] = useState(null);
 
-  const handleSimulateSpeech = () => {
-    if (inputText.trim()) {
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.onresult = handleSpeechResult;
+      setRecognition(recognition);
+    }
+  }, []);
+
+  const handleSpeechResult = (event) => {
+    const transcript = Array.from(event.results)
+      .map(result => result[0].transcript)
+      .join('');
+    
+    if (event.results[0].isFinal) {
       const timestamp = new Date().toLocaleTimeString();
-      setTranscriptWithTimestamp(prev => [...prev, { time: timestamp, text: inputText.trim() }]);
-      setInputText('');
+      setTranscriptWithTimestamp(prev => [...prev, { time: timestamp, text: transcript.trim() }]);
     }
   };
 
+  const toggleListening = () => {
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+    setIsListening(!isListening);
+  };
+
   return (
-    <Container className="mt-5">
-      <Card className="shadow-lg">
-        <Card.Body>
-          <h1 className="text-center mb-4">Speech to Text Simulator</h1>
-          <Row className="justify-content-center">
-            <Col md={8}>
-              <Form.Group className="mb-3">
-                <Form.Control
-                  type="text"
-                  placeholder="Type your speech here"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  className="form-control-lg"
-                />
-              </Form.Group>
-              <div className="d-grid gap-2">
+    <Container className="py-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Card className="shadow-lg border-0">
+            <Card.Body className="p-5">
+              <h1 className="text-center mb-4">Speech to Text Converter</h1>
+              <div className="d-flex justify-content-center mb-4">
                 <Button
-                  variant="primary"
+                  variant={isListening ? "danger" : "primary"}
                   size="lg"
-                  onClick={handleSimulateSpeech}
-                  className="mb-3"
+                  onClick={toggleListening}
+                  className="rounded-circle p-3"
                 >
-                  Simulate Speech
+                  {isListening ? <FaMicrophoneSlash size={24} /> : <FaMicrophone size={24} />}
                 </Button>
               </div>
-              <Card className="mt-4">
+              <p className="text-center mb-4">
+                {isListening ? "Listening..." : "Click the microphone to start"}
+              </p>
+              {isListening && (
+                <ProgressBar animated now={100} className="mb-4" />
+              )}
+              <Card className="bg-light">
                 <Card.Body>
                   <h5 className="card-title mb-3">Transcript</h5>
                   <div className="transcript-box" style={{maxHeight: '300px', overflowY: 'auto'}}>
@@ -54,14 +78,16 @@ const SpeechToText = () => {
                   </div>
                 </Card.Body>
               </Card>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </Container>
   );
 };
 
 export default SpeechToText;
+
+
 
 
