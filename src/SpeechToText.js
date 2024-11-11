@@ -4,9 +4,10 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Card, Row, Col, ProgressBar, Alert } from 'react-bootstrap';
-import { FaMicrophone, FaMicrophoneSlash, FaTrash } from 'react-icons/fa';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 
 const SpeechToText = () => {
   const [isListening, setIsListening] = useState(false);
@@ -71,18 +72,10 @@ const SpeechToText = () => {
                   variant={isListening ? "danger" : "primary"}
                   size="lg"
                   onClick={toggleListening}
-                  className="rounded-circle p-3 me-3"
+                  className="rounded-circle p-3"
                   disabled={!!error}
                 >
                   {isListening ? <FaMicrophoneSlash size={24} /> : <FaMicrophone size={24} />}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={clearTranscript}
-                  className="rounded-circle p-3"
-                >
-                  <FaTrash size={24} />
                 </Button>
               </div>
               <p className="text-center mb-4">
@@ -101,6 +94,13 @@ const SpeechToText = () => {
                       </p>
                     ))}
                   </div>
+                  {transcriptWithTimestamp.length > 0 && (
+                    <div className="text-center mt-3">
+                      <a href="#" onClick={(e) => { e.preventDefault(); clearTranscript(); }} className="text-muted">
+                        Clear transcript
+                      </a>
+                    </div>
+                  )}
                 </Card.Body>
               </Card>
             </Card.Body>
@@ -112,6 +112,7 @@ const SpeechToText = () => {
 };
 
 export default SpeechToText;
+
 
 
 
