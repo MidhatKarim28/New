@@ -5,6 +5,7 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Card, Row, Col, ProgressBar, Alert } from 'react-bootstrap';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
@@ -65,7 +66,7 @@ const SpeechToText = () => {
         <Col md={8}>
           <Card className="shadow-lg border-0">
             <Card.Body className="p-5">
-              <h1 className="text-center mb-4">Speech to Text Converter</h1>
+              <h1 className="text-center mb-4">AI Clinical Notes</h1>
               {error && <Alert variant="danger">{error}</Alert>}
               <div className="d-flex justify-content-center mb-4">
                 <Button
@@ -79,14 +80,14 @@ const SpeechToText = () => {
                 </Button>
               </div>
               <p className="text-center mb-4">
-                {isListening ? "Listening..." : "Click the microphone to start"}
+                {isListening ? "Listening..." : "Click the microphone to start dictating"}
               </p>
               {isListening && (
                 <ProgressBar animated now={100} className="mb-4" />
               )}
               <Card className="bg-light">
                 <Card.Body>
-                  <h5 className="card-title mb-3">Transcript</h5>
+                  <h5 className="card-title mb-3">Clinical Notes</h5>
                   <div className="transcript-box" style={{maxHeight: '300px', overflowY: 'auto'}}>
                     {transcriptWithTimestamp.map((item, index) => (
                       <p key={index} className="mb-2">
@@ -97,7 +98,7 @@ const SpeechToText = () => {
                   {transcriptWithTimestamp.length > 0 && (
                     <div className="text-center mt-3">
                       <a href="#" onClick={(e) => { e.preventDefault(); clearTranscript(); }} className="text-muted">
-                        Clear transcript
+                        Clear notes
                       </a>
                     </div>
                   )}
@@ -112,6 +113,7 @@ const SpeechToText = () => {
 };
 
 export default SpeechToText;
+
 
 
 
