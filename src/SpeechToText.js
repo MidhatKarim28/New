@@ -3,14 +3,16 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Card, Row, Col, ProgressBar } from 'react-bootstrap';
-import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
+import { Button, Container, Card, Row, Col, ProgressBar, Alert } from 'react-bootstrap';
+import { FaMicrophone, FaMicrophoneSlash, FaTrash } from 'react-icons/fa';
 
 const SpeechToText = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcriptWithTimestamp, setTranscriptWithTimestamp] = useState([]);
   const [recognition, setRecognition] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -19,7 +21,10 @@ const SpeechToText = () => {
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.onresult = handleSpeechResult;
+      recognition.onerror = handleError;
       setRecognition(recognition);
+    } else {
+      setError("Your browser doesn't support speech recognition. Please try using Chrome or Edge.");
     }
   }, []);
 
@@ -34,13 +39,23 @@ const SpeechToText = () => {
     }
   };
 
+  const handleError = (event) => {
+    setError(`Speech recognition error: ${event.error}`);
+    setIsListening(false);
+  };
+
   const toggleListening = () => {
     if (isListening) {
       recognition.stop();
     } else {
       recognition.start();
+      setError(null);
     }
     setIsListening(!isListening);
+  };
+
+  const clearTranscript = () => {
+    setTranscriptWithTimestamp([]);
   };
 
   return (
@@ -50,14 +65,24 @@ const SpeechToText = () => {
           <Card className="shadow-lg border-0">
             <Card.Body className="p-5">
               <h1 className="text-center mb-4">Speech to Text Converter</h1>
+              {error && <Alert variant="danger">{error}</Alert>}
               <div className="d-flex justify-content-center mb-4">
                 <Button
                   variant={isListening ? "danger" : "primary"}
                   size="lg"
                   onClick={toggleListening}
-                  className="rounded-circle p-3"
+                  className="rounded-circle p-3 me-3"
+                  disabled={!!error}
                 >
                   {isListening ? <FaMicrophoneSlash size={24} /> : <FaMicrophone size={24} />}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={clearTranscript}
+                  className="rounded-circle p-3"
+                >
+                  <FaTrash size={24} />
                 </Button>
               </div>
               <p className="text-center mb-4">
@@ -87,6 +112,7 @@ const SpeechToText = () => {
 };
 
 export default SpeechToText;
+
 
 
 
